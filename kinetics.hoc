@@ -1,0 +1,107 @@
+create a
+a	{nseg=1 diam=5 L=5 
+	insert nargc ena=55
+	insert pas g_pas=1/10000 Ra=150 cm=1}
+access a
+
+tstop=5
+vlow=-120
+vhigh=30
+dt=0.01
+celsius=22
+
+objref gk, b,gt,vc, gs,c, gf,ic
+b = new VBox()
+c = new VBox()
+b.intercept(1)
+gk = new Graph(0)
+gk.view(vlow,0,vhigh-vlow,1,0,0,100,200)
+gk.exec_menu("New Axis")
+gk.exec_menu("10% Zoom out")
+gk.label(0.1,0.9,"Steady-states")
+gk.addexpr("minf_nargc",3,2, 2*tstop,0,2)
+gk.addexpr("hinf_nargc",2,2, 2*tstop,0,2)
+
+gt = new Graph(0)
+gt.view(vlow,0,vhigh-vlow,4,0,0,100,200)
+gt.exec_menu("New Axis")
+gt.exec_menu("10% Zoom out")
+gt.label(0.1,0.9,"time constants")
+gt.addexpr("mtau_nargc*10",3,2, 2*tstop,0,2)
+gt.addexpr("htau_nargc",2,2, 2*tstop,0,2)
+
+xpanel("")
+xbutton("run ", "run()")
+xpanel()
+b.intercept(0)
+b.map("Na kinetics for RGC",100,0,200,400)
+
+c.intercept(1)
+gs = new Graph(0)
+gs.view(0,-1300,tstop,1300,0,0,100,200)
+gs.exec_menu("New Axis")
+gs.exec_menu("10% Zoom out")
+gs.label(0.1,0.9,"current (pA), Fig.6C, step from -90mV")
+gs.exec_menu("Keep Lines")
+
+c.intercept(0)
+c.map("activation",390,0,500,370)
+
+vc = new SEClamp(0.5)
+
+proc run() {
+gk.begin()
+for (v=vlow; v<vhigh; v=v+1) {
+    trates_nargc(v)
+    gk.plot(v)
+}
+gk.flush()
+doNotify()
+
+gt.begin()
+gt.color(2)
+gt.label(0.1,0.4,"tau_inact.")
+gt.color(3)
+gt.label(0.4,0.17,"tau_act.*10")
+for (v=vlow; v<vhigh; v=v+1) {
+    trates_nargc(v)
+    gt.plot(v)
+}
+gt.flush()
+doNotify()
+
+
+gbar_nargc=0.07
+gs.color(2)
+gs.label(0.4,0.6,"-30")
+gs.color(3)
+gs.label(0.4,0.5,"-15")
+gs.color(4)
+gs.label(0.4,0.4,"0")
+gs.color(7)
+gs.label(0.4,0.3,"45")
+
+gs.begin()
+k=-45
+color=1
+while (k<56) {
+gs.addexpr("ina*area(0.5)*10",color,1, 2*tstop,0,2) // *10=pA, *1e-2=nA
+t=0
+vc.amp1=-90
+vc.dur1=0.2
+vc.amp2=k
+vc.dur2=tstop
+forall {finitialize(vc.amp1)}
+while (t<tstop) {
+    fadvance()
+    gs.plot(t)
+    }
+gs.flush()
+doNotify()
+k=k+15
+color=color+1
+gs.begin()
+}
+}
+
+
