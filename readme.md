@@ -1,6 +1,6 @@
 NEURON mod files for the Na current from the papers:
 Skaliora, Scobey and Chalupa, J.Neurosci. 13:313 (1993) (exp.)
-Benison et al., J.Theor.Biol. 210:187 (2001) (model).
+Benison et al., *J.Theor.Biol*. 210:187 (2001) (model).
 
 - Running the kinetics.hoc simulation file will show 
 the activation and inactivation steady-states, the time constants, 
@@ -33,3 +33,7 @@ authors of the modeling paper.
 
 Questions on how to use this model with NEURON
 should be directed to michele@pa.ibf.cnr.it
+
+Changelog:
+----------
+2024-10: Converted readme to markdown
